@@ -1,0 +1,186 @@
+import java.util.*;
+public class Stub{
+
+ public static void main (String[] args){
+ Scanner myscanner = new Scanner(System.in);
+ int items = myscanner.nextInt();
+ myscanner.nextLine();
+ String[] contents = new String[items];
+ for(int i=0;i<items;i++){
+ contents[i]=myscanner.nextLine();
+ }
+ HashTable mytable = new HashTable();
+ Solution mysolution = new Solution(mytable);
+ mysolution.fill(contents);
+ mysolution = new Solution(mytable);
+ for(int i=0;i<items;i++){
+ int rand = (int)(Math.random()*items);
+ String temp = contents[i];
+ contents[i]=contents[rand];
+ contents[rand]=temp;
+ }
+ for(int i=0;i<items;i++){
+ int slot = mysolution.find(contents[i]);
+ if(!mytable.check(slot,contents[i])){
+ System.out.println("error!");
+ }
+ }
+ System.out.println(mytable.gettotal());
+ }
+}
+
+
+class HashTable{
+
+ public int size = 99991;
+ private String[] hashTable;
+ private int total=0;
+ public HashTable(){
+ hashTable = new String[size];
+ for(int i=0;i<size;i++){
+ hashTable[i]="";
+ }
+ }
+ public boolean check(int slot, String check){
+ if(hashTable[slot].equals(check)){
+ return true;
+ }else{
+ total++;
+ return false;
+ }
+ }
+
+ public void set(int slot, String word){
+ hashTable[slot]=word;
+ }
+
+ public int gettotal(){
+ return total;
+ }
+}
+class Solution{
+
+ HashTable mytable = new HashTable();
+ int size = mytable.size;
+ public Solution(HashTable input){
+
+ mytable = input;
+ //this is the constructor
+
+ }
+
+ public int find(String word){
+
+ //fill this in so as to minimize collisions
+ //this method should return the slot in the HashTable where
+the word is
+ int index = getHashKey(word);
+//calculate the hash key for the word
+ while(mytable.check(index,word)!=true){
+//as long as you do not stumble across the word keep searching
+ index++;
+index=index%size;
+//always mod the index size so it doesn't go out of bounds
+ }
+ return index;
+ }
+
+ public void fill(String[] array){
+
+ //fill this in using some hashing strategy
+ //this should add all the words in the array into the
+HashTable
+
+
+ //this variable stores the total number of collisions that
+have occurred for every word
+ for(int i=0; i<array.length;i++){
+//go through all words
+ int index = getHashKey(array[i]);
+//generate a hash key
+ while(mytable.check(index,"")==false){
+//if that slot is already filled move onto the next slot and
+increment the collisions
+ index++;
+ index=index%size;
+//make sure you don't go off the edge of the hash table
+ }
+ mytable.set(index,array[i]);
+ }
+
+ }
+
+
+
+ public int getHashKey(String word){
+//this is the primary hash key function - it should return a number
+which is a slot in the hash table
+//for words, a good strategy is to raise each character to
+successive powers of the alphabet size
+//assume that the alphabet is ASCII characters - a total of 256
+possibilities
+//each successive character value should be raised to successive
+powers of 256
+//the whole thing is added together and then moduloed to create a
+hash table index
+ int total = 0;
+ for(int i=0; i<word.length();i++){
+
+total=total+modMult((int)word.charAt(i),modPow(128,i,size),size);
+//raise each letter to succssive powers of 128
+//this will create a unique value for every possible string because
+there are only 127 ASCII characters
+ }
+ return total%size;
+//now 'hash' this unique value down to the size of the hash table
+ }
+
+
+ public int modPow(int number, int power, int modulus){
+//raises a number to a power with the given modulus
+//when raising a number to a power, the number quickly becomes too
+large to handle
+//you need to multiply numbers in such a way that the result is
+consistently moduloed to keep it in the range
+//however you want the algorithm to work quickly - having a
+multiplication loop would result in an O(n) algorithm!
+//the trick is to use recursion - keep breaking the problem down
+into smaller pieces and use the modMult method to join them back
+together
+ if(power==0)
+ return 1;
+ else if (power%2==0) {
+ int halfpower=modPow(number, power/2, modulus);
+ return modMult(halfpower,halfpower,modulus);
+ }else{
+ int halfpower=modPow(number, power/2, modulus);
+ int firstbit = modMult(halfpower,halfpower,modulus);
+ return modMult(firstbit,number,modulus);
+ }
+ }
+
+ public int modMult(int first, int second, int modulus){
+//multiplies the first number by the second number with the given
+modulus
+//a long can have a maximum of 19 digits. Therefore, if you're
+multiplying two ten digits numbers the usual way, things will go
+wrong
+//you need to multiply numbers in such a way that the result is
+consistently moduloed to keep it in the range
+//however you want the algorithm to work quickly - having an
+addition loop would result in an O(n) algorithm!
+//the trick is to use recursion - keep breaking down the
+multiplication into smaller pieces and mod each of the pieces
+individually
+ if(second==0)
+ return 0;
+ else if (second%2==0) {
+ int half=modMult(first, second/2, modulus);
+ return (half+half)%modulus;
+ }else{
+ int half=modMult(first, second/2, modulus);
+ return (half+half+first)%modulus;
+
+}
+ }
+ }
