@@ -1,0 +1,34 @@
+import java.util.*;
+public class lab03 {
+    static void get(String s)
+    {
+        int ar[] = new int[256];// Create an array of size 256 i.e. ASCII_SIZE
+        int len = s.length();
+        for (int i = 0; i < len; i++){
+            ar[s.charAt(i)]++;}
+        char ch[] = new char[len];// Create an array of given String size
+        for (int i = 0; i < len; i++){
+            ch[i] = s.charAt(i);
+            int found = 0; //found gets reset every loop
+            for (int j = 0; j <= i; j++) {
+                if(s.charAt(i) == ch[j]){// If any matches found
+                    found++;}
+            }
+           if(found == 1 && ar[s.charAt(i)]>1){ //first test to print any char that shows up multiple times
+                System.out.println("'"+s.charAt(i)+"'"+" appeared "+ar[s.charAt(i)]+" times");
+            }
+            else if(found == 1 && ar[s.charAt(i)]<2){ //first test to show any char that shows any single time
+                System.out.println("'"+s.charAt(i)+"'"+" appeared "+ar[s.charAt(i)]+" time");
+            }}}
+    public static void main(String[] args)
+    {
+        Scanner sc = new Scanner(System.in);
+        String s = "The cat sat on the mat"; //given sentence.
+        //String s=sc.nextLine(); //if asked for a user input string
+        System.out.println("Enter your sentence: "+s);System.out.println("");
+        for(int x=0;x<s.length();x++){ //For loop which prints the strings chars that have been converted to intigers which will then be converted to binary string
+        	System.out.print(Integer.toBinaryString(s.charAt(x))+" ");
+    	}
+        System.out.println("");System.out.println("");
+        get(s); //calls the class get to count appearances of symbols
+    }}
